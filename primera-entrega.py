@@ -3,7 +3,8 @@ import numpy as np
 # Definimos las constantes según nuestro caso del modelo
 x0 = -7.5  # Asumiendo que x0 = -x1
 x1 = 7.5   # Asumiendo que x1 = -x0
-L = 15.0   # Longitud entre los puntos (ajusta este valor según el problema)
+cantidad_de_puntos = 22
+L = 50   # Longitud entre los puntos (ajusta este valor según el problema)
 
 # Definimos la función f(mu) basada en la condición de longitud
 def f(mu):
@@ -39,7 +40,9 @@ print("Valor de C2", C2)
 
 
 #-------------- LINEALIZACION --------------
-puntos = [-6.8, -6.1, -5.4, -4.7, -4.0, -3.3, -2.6, -1.9, -1.2, -0.5, 0.2, 0.9, 1.6, 2.3, 3.0, 3.7, 4.4, 5.3, 6.0, 6.7]
+
+puntos = np.linspace(x0 + (x1 - x0) / (20+ 1), x1 - (x1 - x0) / (20+ 1), 20)
+print("puntos",puntos)
 
 def catenaria(x):
     return ((np.cosh((mu*x)))/mu + C2)
@@ -76,3 +79,5 @@ soluciones_medidas = c[0,0]*fi0+c[1,0]*fi1+c[2,0]*fi2
 dif=soluciones - soluciones_medidas
 ecm=np.sqrt(np.inner(dif, dif) / 20)
 print("ECM", ecm[0,0])
+
+print("soluciones", soluciones)
