@@ -5,6 +5,7 @@ x0 = -7.5  # Asumiendo que x0 = -x1
 x1 = 7.5   # Asumiendo que x1 = -x0
 cantidad_de_puntos = 22
 L = 50   # Longitud entre los puntos (ajusta este valor según el problema)
+n = 20
 
 # Definimos la función f(mu) basada en la condición de longitud
 def f(mu):
@@ -41,8 +42,8 @@ print("Valor de C2", C2)
 
 #-------------- LINEALIZACION --------------
 
-puntos = np.linspace(x0 + (x1 - x0) / (20+ 1), x1 - (x1 - x0) / (20+ 1), 20)
-print("puntos",puntos)
+puntos = np.linspace(x0 + (x1 - x0) / (n+1), x1 - (x1 - x0) / (n+1), n)
+#print("puntos",puntos)
 
 def catenaria(x):
     return ((np.cosh((mu*x)))/mu + C2)
@@ -57,7 +58,7 @@ def obtener_soluciones_catenaria():
 soluciones = np.matrix(obtener_soluciones_catenaria())
 puntos = np.matrix(puntos)
 
-fi0=np.matrix(np.ones(20))
+fi0=np.matrix(np.ones(n))
 fi1=puntos
 fi2=np.power(puntos, 2)
 M=(
@@ -75,9 +76,8 @@ b=np.matrix(b).reshape(3,1)
 c=np.linalg.inv(M)*b
 
 soluciones_medidas = c[0,0]*fi0+c[1,0]*fi1+c[2,0]*fi2
-#print("Medidas", soluciones_medidas)
 dif=soluciones - soluciones_medidas
-ecm=np.sqrt(np.inner(dif, dif) / 20)
+ecm=np.sqrt(np.inner(dif, dif) / n)
 print("ECM", ecm[0,0])
 
-print("soluciones", soluciones)
+#print("soluciones", soluciones)
