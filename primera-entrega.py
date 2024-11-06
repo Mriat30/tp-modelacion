@@ -36,3 +36,43 @@ C2 = y1*mu - (np.cosh(mu*x1)) #despejando de la ecuación (3)
 print("Valor de mu:", mu)
 print("Número de iteraciones:", iteration)
 print("Valor de C2", C2)
+
+
+#-------------- LINEALIZACION --------------
+puntos = [-6.8, -6.1, -5.4, -4.7, -4.0, -3.3, -2.6, -1.9, -1.2, -0.5, 0.2, 0.9, 1.6, 2.3, 3.0, 3.7, 4.4, 5.3, 6.0, 6.7]
+
+def catenaria(x):
+    return ((np.cosh((mu*x)))/mu + C2)
+
+def obtener_soluciones_catenaria():
+    y = []
+    for punto in puntos:
+        y.append(catenaria(punto))
+
+    return y
+
+soluciones = np.matrix(obtener_soluciones_catenaria())
+puntos = np.matrix(puntos)
+
+fi0=np.matrix(np.ones(20))
+fi1=puntos
+fi2=np.power(puntos, 2)
+M=(
+    (np.inner(fi0,fi0)), (np.inner(fi0,fi1)), (np.inner(fi0,fi2)),
+    (np.inner(fi1,fi0)), (np.inner(fi1,fi1)), (np.inner(fi1,fi2)),
+    (np.inner(fi2,fi0)), (np.inner(fi2,fi1)), (np.inner(fi2,fi2))
+)
+M=np.array(M).reshape((3,3))
+M=np.matrix(M).reshape((3,3))
+
+b=(np.inner(fi0, soluciones), np.inner(fi1, soluciones), np.inner(fi2, soluciones))
+b=np.array(b).reshape(3,1)
+b=np.matrix(b).reshape(3,1)
+
+c=np.linalg.inv(M)*b
+
+soluciones_medidas = c[0,0]*fi0+c[1,0]*fi1+c[2,0]*fi2
+#print("Medidas", soluciones_medidas)
+dif=soluciones - soluciones_medidas
+ecm=np.sqrt(np.inner(dif, dif) / 20)
+print("ECM", ecm[0,0])
