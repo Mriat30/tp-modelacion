@@ -1,4 +1,4 @@
-import math
+from math import *
 import numpy as np
 
 #LA PARTE A) DE ESTA PRIMERA PARTE FUE REALIZADA EN HOJA. LEER INFORME PARA MÁS DETALLES.

@@ -1,4 +1,5 @@
 import numpy as np
+from matplotlib import pyplot as plt
 
 # Definimos las constantes según nuestro caso del modelo
 x0 = -7.35  # Asumiendo que x0 = -x1
@@ -41,7 +42,7 @@ print("Valor de C2", C2)
 
 #-------------- Ajuste --------------
 
-puntos = np.array([-5.0, -4.5, -4.0, -3.5, -3.0, -2.5, 2.0, -1.5, -1.0, -0.5, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0])
+puntos = np.array([-5.0, -4.5, -4.0, -3.5, -3.0, -2.5, -2.0, -1.5, -1.0, -0.5, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0])
 soluciones_foto = np.array([
     11.464, 8.760, 6.519, 4.898, 3.809, 2.975, 2.309, 1.815, 1.469, 1.241,
     1.119, 1.278, 1.525, 1.846, 2.343, 2.911, 3.761, 4.593, 5.880, 7.287
@@ -86,3 +87,21 @@ print("ECM Catenaria:", ecm[0,0])
 dif=soluciones_foto - soluciones_cuadratica
 ecm=np.sqrt(np.inner(dif, dif) / n)
 print("ECM Cuadrática:", ecm[0,0])
+
+puntos = np.ravel(puntos)
+soluciones_catenaria = np.ravel(soluciones_catenaria)
+soluciones_cuadratica = np.ravel(soluciones_cuadratica)
+
+# Gráfica
+plt.figure(figsize=(10, 6))
+plt.scatter(puntos, soluciones_foto, color='blue', label='Datos Medidos')
+plt.plot(puntos, soluciones_catenaria, color='green', linestyle='-', label='Catenaria')
+plt.plot(puntos, soluciones_cuadratica, color='red', linestyle='--', label='Ajuste Cuadrático')
+
+# Etiquetas y leyenda
+plt.xlabel('X (cm)')
+plt.ylabel('Y (cm)')
+plt.title('Caso 3: 0,3L comparación')
+plt.legend()
+plt.grid(True)
+plt.show()
