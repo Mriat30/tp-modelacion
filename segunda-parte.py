@@ -92,13 +92,11 @@ puntos = np.ravel(puntos)
 soluciones_catenaria = np.ravel(soluciones_catenaria)
 soluciones_cuadratica = np.ravel(soluciones_cuadratica)
 
-# Gráfica
+# Gráficos para comparar ajuste, catenaria y datos medidos
 plt.figure(figsize=(10, 6))
 plt.scatter(puntos, soluciones_foto, color='blue', label='Datos Medidos')
 plt.plot(puntos, soluciones_catenaria, color='green', linestyle='-', label='Catenaria')
 plt.plot(puntos, soluciones_cuadratica, color='red', linestyle='--', label='Ajuste Cuadrático')
-
-# Etiquetas y leyenda
 plt.xlabel('X (cm)')
 plt.ylabel('Y (cm)')
 plt.title('Caso 3: 0,3L comparación')
