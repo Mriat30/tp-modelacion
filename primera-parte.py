@@ -16,13 +16,13 @@ L = P/1300
 
 #Por Newton-Raphson, hallamos mu despejando la misma de la ecuación 4), dado que en este caso se cumplen las condiciones
 def f(mu):
-    return (np.sinh(mu * x1) - np.sinh(mu * x0)) / mu - L
+    return ((np.sinh(mu * x1) - np.sinh(mu * x0)) / mu) - L
 
 # Derivada de f(mu)
 def df(mu):
-    return ((mu * (x1 * np.cosh(mu * x1) - x0 * np.cosh(mu * x0))) - 
-            (np.sinh(mu * x1) - np.sinh(mu * x0))) / (mu ** 2)
+    return (np.sinh(mu*x0) - (mu*x0*np.cosh(mu*x0)) - (np.sinh(mu*x1)) + (mu*x1*np.cosh(mu*x1))) / mu**2
 
+#((mu * (x1 * np.cosh(mu * x1) - x0 * np.cosh(mu * x0))) - (np.sinh(mu * x1) - np.sinh(mu * x0))) / (mu ** 2)
 
 tolerancia = 0.5e-6
 # Newton-Raphson loop
@@ -59,12 +59,12 @@ def catenaria(x):
     return ((np.cosh(mu*x))/mu) + C2
 
 def df_catenaria_mu(x):
-    return ((x*mu*np.sinh(mu*x)) - np.cosh(mu*x))/mu*mu
+    return ((x*mu*np.sinh(mu*x)) - np.cosh(mu*x))/mu**2
 
 #y la derivada respecto de C2 es 1 -> se propaga su error como es de entrada
 y_x_0 = catenaria(0)
 e_y = (abs(df_catenaria_mu(0)) * tolerancia) + 1*ec2
-t = math.ceil(-math.log10(2 * ec2))
+t = math.ceil(-math.log10(2 * e_y))
 y_x_0 = float(f"{y_x_0:.{t}}")
 
 print("------------- RESULTADOS BIEN REDONDEADOS ---------")
@@ -80,12 +80,14 @@ print("------------- EJERCICIO C---------")
 COTA_X0 = COTA_X1 = COTA_Y0 = COTA_Y1 = COTA_L = 0.05
 
 def cota_error_propagado_mu(mu_medido, x1_medido, x0_medido):
-
     dphi_x1 = -((np.cosh(x1_medido * mu_medido)*df(mu_medido)) - f(mu_medido)*x1_medido*np.sinh(x1_medido*mu_medido))/((df(mu_medido)) ** 2)
     dphi_x0 = -(-np.cosh(mu_medido*x0_medido) + x0_medido*np.sinh(x0_medido*mu_medido)*f(mu_medido))/((df(mu_medido)) ** 2)
     dphi_l = 1/(df(mu_medido))
     cota = COTA_X1
+
     return cota * (abs(dphi_x1) + abs(dphi_x0)+ abs(dphi_l))
+
+
 mu_n_menos_1, temp = newton_raphson(0.1, tolerancia, iteration-1)
 cota_error_mu = cota_error_propagado_mu(mu_n_menos_1, x1, x0)
 t = math.ceil(-math.log10(2 * cota_error_mu)) #decimales significativos
@@ -108,13 +110,14 @@ print("Cota de error de C2(redondeado a 1 cifra):",cota_error_c2)
 print("C2 no puede expresarse bien redondeado (el error relativo es mayor al 50%), por ende lo expresamos como cota:", C2,"±", cota_error_c2)
 
 #f(mu_medido, x_medido, c2_medido) =  cosh(mu * x)/mu + C2
+#el error inherente de mu (dato de entrada para esta ecuación) es el obtenido anteriormente, por lo que se reutiliza esa variable
 def cota_total_error_y(mu_medido, x_medido):
-    df_mu = - (np.cosh(x_medido*mu_medido) - (mu_medido*x_medido*np.sinh(mu_medido*x_medido))) / mu_medido**2
+    df_mu = df_catenaria_mu(x_medido)
     df_x = mu_medido*np.sinh(mu_medido * x_medido)
     df_c2 = 1
     return abs(cota_error_mu*df_mu) + abs(cota_error_c2 * df_c2) + abs(COTA_X1*df_x)
 
-cota_error_y = round(cota_total_error_y(round(mu, 3), 0), 1)
+cota_error_y = round(cota_total_error_y(mu_redondeado, 0), 1)
 print("Cota de error de y(x) (redondeado a 1 cifra):", cota_error_y)
 print("Valor de y(0) bien redeondeado:", round(y_x_0))
 print("El valor expresado como intervalo", y_x_0, "±", cota_error_y)
