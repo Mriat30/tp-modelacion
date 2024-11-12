@@ -1,4 +1,4 @@
-from math import *
+import math 
 import numpy as np
 
 #LA PARTE A) DE ESTA PRIMERA PARTE FUE REALIZADA EN HOJA. LEER INFORME PARA MÁS DETALLES.
@@ -23,19 +23,24 @@ def df(mu):
     return ((mu * (x1 * np.cosh(mu * x1) - x0 * np.cosh(mu * x0))) - 
             (np.sinh(mu * x1) - np.sinh(mu * x0))) / (mu ** 2)
 
-# Valor inicial para mu y tolerancia
-mu = 0.1  # Semilla inicial (puede ajustarse este valor)
+
 tolerancia = 0.5e-6
-
 # Newton-Raphson loop
-iteration = 0
-while True:
-    mu_new = mu - f(mu) / df(mu)
-    if abs(mu_new - mu) < tolerancia:
-        break
-    mu = mu_new
-    iteration += 1
+def newton_raphson(semilla, tolerancia, NMAX):
+    # Valor inicial para mu y tolerancia
+    iteration = 0
+    mu = semilla
+    es_mayor_que_tolerancia = True
+    while es_mayor_que_tolerancia and iteration < NMAX:
+        mu_new = mu - f(mu) / df(mu)
+        if abs(mu_new - mu) < tolerancia:
+            es_mayor_que_tolerancia = False
+        mu = mu_new
+        iteration += 1
+    return mu, iteration
 
+mu, iteration = newton_raphson(0.1, tolerancia, 100)
+print(mu, iteration)
 mu = float(f"{mu:.5g}") #para redondear a 6 decimales significativos
 
 #Cálculo del C2
@@ -70,4 +75,43 @@ print("Valor de y(x=0): ", y_x_0)
 
 #--------------------------- ITEM (C) ---------------------------
 #A priori, los cálculos serían los mismos. Solo se modifican sus errores
+#f(mu) = 2senh(mu * x1)/mu - L
+print("------------- EJERCICIO C---------")
+COTA_X0 = COTA_X1 = COTA_Y0 = COTA_Y1 = COTA_L = 0.05
+
+def cota_error_propagado_mu(mu_medido, x1_medido, x0_medido):
+
+    dphi_x1 = -((np.cosh(x1_medido * mu_medido)*df(mu_medido)) - f(mu_medido)*x1_medido*np.sinh(x1_medido*mu_medido))/((df(mu_medido)) ** 2)
+    dphi_x0 = -(-np.cosh(mu_medido*x0_medido) + x0_medido*np.sinh(x0_medido*mu_medido)*f(mu_medido))/((df(mu_medido)) ** 2)
+    dphi_l = 1/(df(mu_medido))
+    cota = COTA_X1
+    return cota * (abs(dphi_x1) + abs(dphi_x0)+ abs(dphi_l))
+mu_n_menos_1, temp = newton_raphson(0.1, tolerancia, iteration-1)
+cota_error_mu = cota_error_propagado_mu(mu_n_menos_1, x1, x0)
+cota_error_mu = round(cota_error_mu, 4)
+print("Cota de error propagado de Mu(redondeado a 4 cifras):",cota_error_mu)
+
+#c2 = f(mu, x1, y1) = y1 - cosh(mu * x1)/mu
+
+def cota_error_c2(mu_medido, x1_medido):
+    df_mu = -(-np.cosh(x1_medido*mu_medido) +  mu_medido*x1_medido*np.sinh(mu_medido*x1_medido)) / mu_medido**2
+    df_x1 = np.sinh(mu_medido * x1_medido)
+    return abs(cota_error_mu*df_mu) + abs(COTA_X1*df_x1) + abs(COTA_Y1 * 1)
+
+cota_error_c2 = cota_error_c2(round(mu,3), x1)
+print(cota_error_c2)
+cota_error_c2 = round(cota_error_c2, 1)
+print("Cota de error de C2(redondeado a 1 cifra):",cota_error_c2)
+
+#f(mu_medido, x_medido, c2_medido) =  cosh(mu * x)/mu + C2
+def cota_error_y(mu_medido, x_medido, c2_medido):
+    df_mu = (mu_medido*x_medido*np.sinh(mu_medido*x_medido) - np.cosh(x_medido*mu_medido))/ mu_medido**2
+    df_x = np.sinh(mu_medido * x_medido)
+    df_c2 = 1
+    return abs(cota_error_mu*df_mu) + abs(cota_error_c2 * 1)
+
+print(cota_error_y(round(mu, 3), 0, C2))
+cota_error_y = round(cota_error_y(round(mu, 3), 0, C2), 1)
+print("Cota de error de y(x) (redondeado a 1 cifra):",cota_error_y)
+
 
