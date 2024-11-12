@@ -90,6 +90,7 @@ mu_n_menos_1, temp = newton_raphson(0.1, tolerancia, iteration-1)
 cota_error_mu = cota_error_propagado_mu(mu_n_menos_1, x1, x0)
 cota_error_mu = round(cota_error_mu, 4)
 print("Cota de error propagado de Mu(redondeado a 4 cifras):",cota_error_mu)
+print("Valor de mu bien redeondeado:", round(mu, 3))
 
 #c2 = f(mu, x1, y1) = y1 - cosh(mu * x1)/mu
 
@@ -102,16 +103,18 @@ cota_error_c2 = cota_error_c2(round(mu,3), x1)
 print(cota_error_c2)
 cota_error_c2 = round(cota_error_c2, 1)
 print("Cota de error de C2(redondeado a 1 cifra):",cota_error_c2)
+print("C2 no puede expresarse bien redondeado, por ende lo expresamos como cota:", C2,"±", cota_error_c2)
 
 #f(mu_medido, x_medido, c2_medido) =  cosh(mu * x)/mu + C2
 def cota_error_y(mu_medido, x_medido, c2_medido):
     df_mu = (mu_medido*x_medido*np.sinh(mu_medido*x_medido) - np.cosh(x_medido*mu_medido))/ mu_medido**2
     df_x = np.sinh(mu_medido * x_medido)
     df_c2 = 1
-    return abs(cota_error_mu*df_mu) + abs(cota_error_c2 * 1)
+    return abs(cota_error_mu*df_mu) + abs(cota_error_c2 * df_c2)
 
 print(cota_error_y(round(mu, 3), 0, C2))
 cota_error_y = round(cota_error_y(round(mu, 3), 0, C2), 1)
 print("Cota de error de y(x) (redondeado a 1 cifra):",cota_error_y)
+print("Valor de y(0) bien redeondeado:", round(y_x_0, 0))
 
 
