@@ -1,5 +1,6 @@
 import math 
 import numpy as np
+from matplotlib import pyplot as plt
 
 #LA PARTE A) DE ESTA PRIMERA PARTE FUE REALIZADA EN HOJA. LEER INFORME PARA MÁS DETALLES.
 
@@ -67,7 +68,7 @@ e_y = (abs(df_catenaria_mu(0)) * tolerancia) + 1*ec2
 t = math.ceil(-math.log10(2 * e_y))
 y_x_0 = float(f"{y_x_0:.{t}}")
 
-print("------------- RESULTADOS BIEN REDONDEADOS ---------")
+print("------------- ITEM B) -------------")
 print("Valor de mu: ", mu)
 print("Valor de C2: ", C2)
 print("Valor de y(x=0): ", y_x_0)
@@ -76,8 +77,11 @@ print("Valor de y(x=0): ", y_x_0)
 #--------------------------- ITEM (C) ---------------------------
 #A priori, los cálculos serían los mismos. Solo se modifican sus errores
 #f(mu) = 2senh(mu * x1)/mu - L
-print("------------- EJERCICIO C---------")
+print("------------- ITEM C) -------------")
 COTA_X0 = COTA_X1 = COTA_Y0 = COTA_Y1 = COTA_L = 0.05
+
+def cpexp(mu, delta_mu): 
+    return abs(f(mu*(1+delta_mu))-f(mu))/(abs(f(mu))*abs(delta_mu))
 
 def cota_error_propagado_mu(mu_medido, x1_medido, x0_medido):
     dphi_x1 = -((np.cosh(x1_medido * mu_medido)*df(mu_medido)) - f(mu_medido)*x1_medido*np.sinh(x1_medido*mu_medido))/((df(mu_medido)) ** 2)
@@ -89,10 +93,26 @@ def cota_error_propagado_mu(mu_medido, x1_medido, x0_medido):
 
 
 mu_n_menos_1, temp = newton_raphson(0.1, tolerancia, iteration-1)
-cota_error_mu = cota_error_propagado_mu(mu_n_menos_1, x1, x0)
+cota_error_mu = cota_error_propagado_mu(mu_n_menos_1, x1, x0) + tolerancia #error total = error inh + error trunc (se desprecian err redondeo)
 t = math.ceil(-math.log10(2 * cota_error_mu)) #decimales significativos
 cota_error_mu = round(cota_error_mu, t)
-print("Cota de error propagado de Mu(redondeado a 4 cifras):",cota_error_mu)
+perturbaciones = []
+cps_exp = []
+for i in range(1,16):
+    delta_mu = 0.1**i
+    perturbaciones.append(delta_mu)
+    cps_exp.append(cpexp(mu, delta_mu))
+
+perturbaciones = np.ravel(perturbaciones)
+cps_exp = np.ravel(cps_exp)
+print("Cota de error propagado de mu (CP analítico):", cota_error_mu)
+plt.figure(figsize=(10, 6))
+plt.scatter(perturbaciones, cps_exp)
+plt.xlabel('Perturbacion delta_mu')
+plt.ylabel('CP mu')
+plt.title('Condición del problema para mu, en base a perturbaciones')
+plt.grid(True)
+plt.show()
 mu_redondeado = round(mu, t-1)
 print("Valor de mu bien redeondeado:", mu_redondeado)
 
