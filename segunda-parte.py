@@ -9,23 +9,22 @@ n = 22  #Puntos considerando los extremos
 y1 = y0 = 24.0 #altura del soporte
 
 # Definimos la función f(mu) basada en la condición de longitud
-def f(mu, x0, x1):
-    return (np.sinh(mu * x1) - np.sinh(mu * x0)) / mu - L
+def f(mu, x1):
+    return ((2*np.sinh(mu*x1)) / mu) - L
 
 # Derivada de f(mu)
-def df(mu, x0, x1):
-    return ((mu * (x1 * np.cosh(mu * x1) - x0 * np.cosh(mu * x0))) - 
-            (np.sinh(mu * x1) - np.sinh(mu * x0))) / (mu ** 2)
+def df(mu, x1):
+    return ((2*mu*x1*np.cosh(mu*x1)) - (2*np.sinh(mu*x1))) / mu**2
 
 # Newton-Raphson loop
 tolerancia = 0.5e-16
-def newton_raphson(semilla, soporte_izquierda, soporte_derecha):
+def newton_raphson(semilla, soporte_derecha):
     mu0 = semilla
-    mu1 = mu0 - f(mu0, soporte_izquierda, soporte_derecha) / df(mu0, soporte_izquierda, soporte_derecha)
+    mu1 = mu0 - f(mu0, soporte_derecha) / df(mu0, soporte_derecha)
 
     while abs(mu1-mu0) > tolerancia:
         mu0 = mu1
-        mu1 = mu0 - f(mu0, soporte_izquierda, soporte_derecha) / df(mu0, soporte_izquierda, soporte_derecha)
+        mu1 = mu0 - f(mu0, soporte_derecha) / df(mu0, soporte_derecha)
 
     return mu1
 
@@ -103,7 +102,7 @@ soluciones_foto = np.array([
 ])
 
 #calculo de mu y c2
-mu_raiz = newton_raphson(0.1, x0, x1)
+mu_raiz = newton_raphson(0.1, x1)
 C2 = y1*mu_raiz - (np.cosh(mu_raiz*x1)) #despejando de la ecuación (3)
 
 # Resultados
@@ -125,7 +124,7 @@ soluciones_foto = np.array([
 ])
 
 #calculo de mu y c2
-mu_raiz = newton_raphson(0.1, x0, x1)
+mu_raiz = newton_raphson(0.1, x1)
 C2 = y1*mu_raiz - (np.cosh(mu_raiz*x1)) #despejando de la ecuación (3)
 
 # Resultados
@@ -148,7 +147,7 @@ soluciones_foto = np.array([
 ])
 
 #calculo de mu y c2
-mu_raiz = newton_raphson(0.1, x0, x1)
+mu_raiz = newton_raphson(0.1, x1)
 C2 = y1*mu_raiz - (np.cosh(mu_raiz*x1)) #despejando de la ecuación (3)
 
 # Resultados
