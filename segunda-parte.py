@@ -18,17 +18,16 @@ def df(mu, x0, x1):
             (np.sinh(mu * x1) - np.sinh(mu * x0))) / (mu ** 2)
 
 # Newton-Raphson loop
-tolerance = 0.5e-4
-def NR(x0, x1):
-    iteration = 0
-    mu = 0.1  # Semilla inicial (puede ajustarse este valor)
-    while True:
-        mu_new = mu - f(mu, x0, x1) / df(mu, x0, x1)
-        if abs(mu_new - mu) < tolerance:
-            break
-        mu = mu_new
-        iteration += 1
-    return mu, iteration
+tolerancia = 0.5e-16
+def newton_raphson(semilla, soporte_izquierda, soporte_derecha):
+    mu0 = semilla
+    mu1 = mu0 - f(mu0, soporte_izquierda, soporte_derecha) / df(mu0, soporte_izquierda, soporte_derecha)
+
+    while abs(mu1-mu0) > tolerancia:
+        mu0 = mu1
+        mu1 = mu0 - f(mu0, soporte_izquierda, soporte_derecha) / df(mu0, soporte_izquierda, soporte_derecha)
+
+    return mu1
 
 #ecuación original
 def catenaria(x):
@@ -104,11 +103,10 @@ soluciones_foto = np.array([
 ])
 
 #calculo de mu y c2
-mu_raiz, iteraciones = NR(x0, x1)
+mu_raiz = newton_raphson(0.1, x0, x1)
 C2 = y1*mu_raiz - (np.cosh(mu_raiz*x1)) #despejando de la ecuación (3)
 
 # Resultados
-print("Número de iteraciones:", iteraciones)
 print("Valor de mu:", mu_raiz)
 print("Valor de C2", C2)
 resultados_soluciones(puntos, soluciones_foto, 'Caso: Comparación de funciones para 0.8L')
@@ -127,11 +125,10 @@ soluciones_foto = np.array([
 ])
 
 #calculo de mu y c2
-mu_raiz, iteraciones = NR(x0, x1)
+mu_raiz = newton_raphson(0.1, x0, x1)
 C2 = y1*mu_raiz - (np.cosh(mu_raiz*x1)) #despejando de la ecuación (3)
 
 # Resultados
-print("Número de iteraciones:", iteraciones)
 print("Valor de mu:", mu_raiz)
 print("Valor de C2", C2)
 resultados_soluciones(puntos, soluciones_foto, 'Caso: Comparación de funciones para 0.7L')
@@ -151,11 +148,10 @@ soluciones_foto = np.array([
 ])
 
 #calculo de mu y c2
-mu_raiz, iteraciones = NR(x0, x1)
+mu_raiz = newton_raphson(0.1, x0, x1)
 C2 = y1*mu_raiz - (np.cosh(mu_raiz*x1)) #despejando de la ecuación (3)
 
 # Resultados
-print("Número de iteraciones:", iteraciones)
 print("Valor de mu:", mu_raiz)
 print("Valor de C2", C2)
 resultados_soluciones(puntos, soluciones_foto, 'Caso: Comparación de funciones para 0.3L')
