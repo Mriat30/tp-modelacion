@@ -15,7 +15,7 @@ y0 = y1 = P/2100
 L = P/1300
 
 
-#Por Newton-Raphson, hallamos mu despejando la misma de la ecuación 4), dado que en este caso se cumplen las condiciones
+#Por Newton-Raphson, hallamos mu igualando la ecuación 4) a 0 (ver anexo), dado que en este caso se cumplen las condiciones
 def f(mu):
     return ((2*np.sinh(mu*x1)) / mu) - L
 
@@ -23,7 +23,6 @@ def f(mu):
 def df(mu):
     return ((2*mu*x1*np.cosh(mu*x1)) - (2*np.sinh(mu*x1))) / mu**2
 
-#((mu * (x1 * np.cosh(mu * x1) - x0 * np.cosh(mu * x0))) - (np.sinh(mu * x1) - np.sinh(mu * x0))) / (mu ** 2)
 
 tolerancia = 0.5e-16 #el menor error de truncamiento que este ordenador permite debido a su mantisa (16 decimales)
 
@@ -121,12 +120,11 @@ def cota_error_total_c2(mu_medido, x1_medido):
     return abs(cota_error_mu*df_mu) + abs(COTA_X1*df_x1) + abs(COTA_Y1 * df_y1)
 
 cota_error_c2 = cota_error_total_c2(mu_redondeado, x1)
-#cota_error_c2 = round(cota_error_c2, 1)
-print("Cota de error de C2(redondeado a 1 cifra):",cota_error_c2)
-#erc2 = (cota_error_c2/C2)*100 -> Por si se desea obtener error relativo de C2. Da alrededor de 54%
-print("C2 no puede expresarse bien redondeado (el error relativo es mayor al 50%), por ende lo expresamos como cota:", C2,"±", cota_error_c2)
+print("Cota de error de C2:",cota_error_c2)
+#erc2 = (cota_error_c2/C2)*100 -> Por si se desea obtener error relativo de C2. Da alrededor de 35%
+print("C2 bien redondeado:", round(C2)) #t=0 y es un decimal, por lo que redondea a 0
+print("C2 expresado como intervalo: ", C2, "±", math.ceil(cota_error_c2 * 100) / 100)
 
-#f(mu_medido, x_medido, c2_medido) =  cosh(mu * x)/mu + C2
 #el error inherente de mu (dato de entrada para esta ecuación) es el obtenido anteriormente, por lo que se reutiliza esa variable
 def cota_total_error_y(mu_medido, x_medido):
     df_mu = df_catenaria_mu(x_medido)
@@ -134,7 +132,7 @@ def cota_total_error_y(mu_medido, x_medido):
     df_c2 = 1
     return abs(cota_error_mu*df_mu) + abs(cota_error_c2 * df_c2) + abs(COTA_X1*df_x)
 
-cota_error_y = round(cota_total_error_y(mu_redondeado, 0), 1)
-print("Cota de error de y(x) (redondeado a 1 cifra):", cota_error_y)
+cota_error_y = cota_total_error_y(mu_redondeado, 0)
+print("Cota de error de y(x):", cota_error_y)
 print("Valor de y(0) bien redeondeado:", round(y_x_0))
-print("El valor expresado como intervalo", y_x_0, "±", cota_error_y)
+print("El valor expresado como intervalo", y_x_0, "±", round(cota_error_y, 1))
